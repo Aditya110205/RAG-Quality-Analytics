@@ -1,0 +1,8 @@
+RAGAS (RAG Assessment) evaluates RAG pipelines without human labels:
+- Uses LLM-as-judge for faithfulness, relevancy, precision, recall
+- Requires: question, answer, contexts, ground_truth (optional)
+- Faithfulness: decompose answer into claims, verify each against context
+- Answer Relevancy: generate questions from answer, compare to original
+- Context Precision: rank contexts by relevance to question
+- Context Recall: check if ground truth info present in contexts
+- Outputs: per-query scores + aggregate statistics

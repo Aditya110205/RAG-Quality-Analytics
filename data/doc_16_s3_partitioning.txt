@@ -1,0 +1,7 @@
+S3 partitioning strategy for analytics pipeline:
+- Raw logs: s3://bucket/raw-logs/year=2024/month=01/day=15/hour=10/*.jsonl
+- Cleaned Parquet: s3://bucket/cleaned/year=2024/month=01/day=15/config=abc123/*.parquet
+- Marts: s3://bucket/marts/fact_queries/year=2024/month=01/*.parquet
+- Partition by: date (time-series queries), config_hash (experiment comparison)
+- Hive-style partitioning enables partition pruning in Spark/DuckDB
+- Lifecycle policies: raw logs 30 days, cleaned 1 year, marts 3 years

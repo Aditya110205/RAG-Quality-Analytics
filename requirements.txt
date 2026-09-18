@@ -1,0 +1,8 @@
+sentence-transformers==3.4.1
+ollama==0.4.7
+chromadb==1.5.9
+python-dotenv==1.2.3
+numpy==2.5.3
+pydantic==2.13.5
+typer==0.27.2
+rich==15.0.0

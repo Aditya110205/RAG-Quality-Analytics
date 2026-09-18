@@ -1,0 +1,9 @@
+Ollama runs LLMs locally (free, private, no API keys):
+- Install: curl -fsSL https://ollama.com/install.sh | sh
+- Pull model: ollama pull llama3.2:3b (or phi3, gemma2, mistral)
+- Python client: ollama.chat(model='llama3.2:3b', messages=[...])
+- API compatible with OpenAI (base_url='http://localhost:11434/v1')
+- Models: llama3.2:3b (fast, 2GB), llama3.1:8b (better, 4.7GB)
+- GPU acceleration auto-detected (CUDA, Metal, ROCm)
+
+Trade-off: smaller models faster but less capable. 3B good for RAG with good retrieval.

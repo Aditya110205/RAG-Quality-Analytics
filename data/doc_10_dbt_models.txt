@@ -1,0 +1,9 @@
+dbt (data build tool) transforms raw data into analytics-ready marts:
+- Staging models: clean, typed, renamed columns from raw Parquet
+- Intermediate models: business logic, aggregations, joins
+- Mart models: final fact/dimension tables for dashboards
+- Tests: not_null, unique, accepted_values, relationships
+- Docs: auto-generated data catalog
+- Jinja macros: reusable SQL snippets
+
+Models are SELECT statements; dbt handles DAG execution, incremental builds.

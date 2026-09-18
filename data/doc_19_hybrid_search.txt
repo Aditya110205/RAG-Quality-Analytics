@@ -1,0 +1,9 @@
+Hybrid search combines vector + keyword (BM25) for better recall:
+- Vector search: semantic similarity, catches synonyms, misses exact terms
+- BM25: exact term matching, catches keywords, misses semantic matches
+- Fusion: reciprocal rank fusion (RRF) or weighted score combination
+- Chroma supports hybrid via metadata filtering + vector search
+- Weaviate, Qdrant have native hybrid indexes
+- Improves hit rate on entity-heavy queries (names, codes, IDs)
+
+Use when: domain-specific terminology, exact matches matter, mixed query types.

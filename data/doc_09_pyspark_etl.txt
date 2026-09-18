@@ -1,0 +1,8 @@
+PySpark processes large-scale log data for analytics pipeline:
+- Read JSON logs from S3 (partitioned by date)
+- Clean: parse timestamps, extract fields, handle nulls
+- Enrich: add derived fields (latency buckets, cost tiers)
+- Write Parquet to S3 (partitioned by date, config_hash)
+- Schema evolution: handle new fields gracefully
+
+Spark handles billions of rows, fault tolerance, parallel execution. DuckDB for final warehouse (fast OLAP, SQL interface).

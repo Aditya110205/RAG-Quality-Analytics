@@ -1,0 +1,11 @@
+FastAPI serves analytics via REST API:
+- GET /health: system status
+- GET /metrics/summary: latest KPIs (hit_rate, faithfulness, p95_latency)
+- GET /metrics/timeseries: metric trends over time (with filters)
+- GET /experiments/best: Pareto-optimal configs
+- POST /query: run RAG query (for integration testing)
+- Pydantic models for request/response validation
+- Dependency injection for DB connections
+- OpenAPI docs at /docs auto-generated
+
+Replaces duplicate logic in Streamlit/Power BI. Single source of truth.

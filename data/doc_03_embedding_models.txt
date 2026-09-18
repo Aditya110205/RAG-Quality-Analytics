@@ -1,0 +1,8 @@
+Embedding models convert text to dense vectors. Popular options:
+- all-MiniLM-L6-v2 (384 dim): Fast, good quality, 22M params. Great default for RAG.
+- all-mpnet-base-v2 (768 dim): Higher quality, slower, 110M params.
+- OpenAI text-embedding-3-small (1536 dim): Strong performance, API cost.
+- OpenAI text-embedding-3-large (3072 dim): Best quality, highest cost.
+- BGE models: Strong open-source alternatives.
+
+Key properties: dimensionality affects storage/search speed; training data affects domain adaptation; max sequence length limits chunk size.
