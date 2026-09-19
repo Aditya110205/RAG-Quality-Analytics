@@ -1,0 +1,8 @@
+PySpark is the Python API for Apache Spark.
+It allows Python applications to process large datasets using Spark.
+
+PySpark DataFrames provide a structured interface for transformations
+and analytical operations.
+
+PySpark is commonly used for batch ETL, data cleaning,
+large-scale transformations, and data lake processing.

@@ -1,0 +1,8 @@
+Docker is a platform for packaging applications and their dependencies
+inside containers.
+
+A Docker image contains the files and dependencies required to run an application.
+A container is a running instance of an image.
+
+Docker helps create consistent environments across development,
+testing, and production systems.

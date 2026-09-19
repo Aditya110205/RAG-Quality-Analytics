@@ -1,7 +1,0 @@
-Chunking strategies significantly impact RAG performance. Fixed-size chunking splits text by token count (e.g., 256 tokens) with optional overlap (e.g., 10%). Semantic chunking uses sentence boundaries or topic shifts. Recursive chunking tries multiple separators (paragraphs, sentences, words).
-
-Trade-offs:
-- Smaller chunks: higher precision, more focused context, but may lose broader context
-- Larger chunks: more context, but diluted relevance and higher token costs
-- Overlap: preserves context across boundaries, increases storage by ~10-20%
-- Optimal chunk size depends on embedding model, query type, and document structure

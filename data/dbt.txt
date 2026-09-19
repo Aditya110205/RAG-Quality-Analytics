@@ -1,0 +1,7 @@
+dbt is a transformation tool used in modern data platforms.
+It allows data teams to transform data using SQL inside a warehouse.
+
+dbt supports models, tests, documentation, and dependency management.
+Models can be organized into staging, intermediate, and mart layers.
+
+dbt is commonly used after raw data has been loaded into a warehouse.

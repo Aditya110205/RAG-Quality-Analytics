@@ -1,0 +1,8 @@
+Apache Spark is a distributed data processing framework.
+It can process large datasets across multiple machines.
+
+Spark provides APIs for batch processing, SQL, streaming,
+machine learning, and graph processing.
+
+Spark transformations are generally evaluated lazily.
+This allows Spark to optimize execution before running the computation.

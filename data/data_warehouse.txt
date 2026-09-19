@@ -1,0 +1,7 @@
+A data warehouse is a centralized system optimized for analytical queries.
+It typically stores structured and transformed business data.
+
+Data warehouses commonly use fact and dimension tables.
+They support reporting, dashboards, aggregation, and business intelligence.
+
+Examples include Snowflake, Amazon Redshift, and Google BigQuery.

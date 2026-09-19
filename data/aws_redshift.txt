@@ -1,0 +1,8 @@
+Amazon Redshift is a cloud data warehouse provided by AWS.
+It is designed for analytical workloads involving large datasets.
+
+Redshift uses column-oriented storage and massively parallel processing.
+It can query structured data using SQL.
+
+Data engineers commonly load data from S3 into Redshift
+for analytics and business intelligence workloads.

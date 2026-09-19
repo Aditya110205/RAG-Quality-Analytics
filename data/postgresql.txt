@@ -1,0 +1,8 @@
+PostgreSQL is an open-source relational database management system.
+It supports SQL, transactions, indexes, constraints, and complex queries.
+
+PostgreSQL is commonly used for transactional applications,
+data services, and analytical workloads involving moderate datasets.
+
+It supports advanced features such as window functions,
+common table expressions, JSON data, and extensions.

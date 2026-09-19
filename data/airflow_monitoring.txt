@@ -1,0 +1,9 @@
+Airflow monitoring helps data engineers identify failed or slow tasks.
+The Airflow user interface provides information about DAG runs,
+task states, logs, and execution history.
+
+Retries can automatically rerun failed tasks.
+Alerts can notify engineers when important workflows fail.
+
+Monitoring is important because production data pipelines
+need visibility into failures and operational performance.

@@ -1,0 +1,7 @@
+Chroma is an open-source vector database designed for AI applications.
+It can store embeddings together with associated documents and metadata.
+
+Vector databases allow applications to search for semantically similar content.
+A query is converted into an embedding and compared with stored embeddings.
+
+Chroma can be used to build retrieval systems for RAG applications.

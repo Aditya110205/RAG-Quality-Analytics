@@ -1,9 +1,0 @@
-Streamlit builds interactive data apps in pure Python:
-- st.line_chart, st.bar_chart, st.area_chart for quick plots
-- st.plotly_chart for interactive Plotly figures
-- st.dataframe for sortable, filterable tables
-- st.selectbox, st.slider, st.date_input for controls
-- st.cache_data, st.cache_resource for performance
-- Session state for multi-page apps
-
-Pages: Overview (volume, latency), Quality (RAGAS scores), Retrieval (hit rate, MRR), Experiments (config comparison).

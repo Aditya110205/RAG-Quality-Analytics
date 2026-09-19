@@ -1,9 +1,0 @@
-Vector databases store and index embeddings for fast similarity search. Types:
-- Chroma: Lightweight, embedded, great for prototyping. Supports metadata filtering.
-- Pinecone: Managed, scalable, enterprise features.
-- Weaviate: GraphQL, hybrid search, modules for ML.
-- Qdrant: Rust-based, high performance, filtering.
-- Milvus: Distributed, billion-scale, multiple index types.
-- FAISS: Library (not DB), fast ANN search, need custom serving.
-
-Index types: HNSW (hierarchical navigable small world) - most popular, good recall/speed tradeoff. IVF (inverted file) - partition-based, faster build. PQ (product quantization) - compresses vectors.

@@ -1,7 +1,0 @@
-Operational metrics track system health and cost:
-- Latency: P50, P95, P99 (NumPy percentiles). Target P95 < 5s.
-- Token usage: prompt tokens, completion tokens, total per query.
-- Cost: $/query, $/1K queries (embedding + LLM calls).
-- Throughput: queries/second, concurrent users.
-- Error rate: failed queries / total queries.
-- Anomaly detection: latency z-scores, 3-sigma flags for outliers.

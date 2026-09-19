@@ -1,9 +1,0 @@
-Power BI for executive dashboards:
-- Star schema: fact_queries, dim_config, dim_date, dim_user
-- Measures: avg_latency, hit_rate, faithfulness, cost_per_1k
-- Visuals: KPI cards, trend lines, scatter (quality vs cost), Pareto frontier
-- Row-level security: filter by team/environment
-- Scheduled refresh from warehouse
-- Export to PDF/PowerPoint for leadership reviews
-
-Executive view: "Are we improving? What config is best? What's the cost?"

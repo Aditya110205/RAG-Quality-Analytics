@@ -1,0 +1,9 @@
+Apache Parquet is a columnar storage file format.
+It is designed for efficient analytical workloads.
+
+Parquet stores data by columns rather than by rows.
+This can reduce the amount of data read when a query only needs
+specific columns.
+
+Parquet also supports compression and efficient encoding.
+It is widely used in data lake and Spark-based architectures.

@@ -1,0 +1,9 @@
+SQL is a language used to query and manipulate relational data.
+It supports operations such as SELECT, INSERT, UPDATE, and DELETE.
+
+SQL queries can filter, aggregate, join, and sort data.
+Window functions can calculate values across related rows
+without collapsing the result into groups.
+
+SQL is one of the most important tools in data engineering
+and analytical workloads.

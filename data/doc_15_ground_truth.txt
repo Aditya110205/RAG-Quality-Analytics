@@ -1,9 +1,0 @@
-Ground truth dataset enables quantitative evaluation:
-- Curated Q&A pairs from domain experts
-- Each entry: question, answer, relevant_doc_ids, relevant_chunk_ids
-- Minimum 50-100 questions for statistical significance
-- Covers: factoid, multi-hop, negative (unanswerable), ambiguous
-- Version controlled with code (data/ground_truth.jsonl)
-- Used for: hit rate, MRR, answer correctness, regression testing
-
-Without ground truth, you only have proxy metrics (heuristics).

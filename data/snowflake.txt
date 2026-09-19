@@ -1,0 +1,9 @@
+Snowflake is a cloud-based data platform designed for data warehousing
+and analytical workloads.
+
+Snowflake separates compute and storage.
+Organizations can create different virtual warehouses
+for different workloads.
+
+Snowflake supports SQL, semi-structured data, data sharing,
+and scalable analytical processing.

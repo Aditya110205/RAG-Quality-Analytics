@@ -1,7 +1,0 @@
-Generation quality metrics (RAGAS) evaluate answer quality given retrieved context:
-- Faithfulness: Answer claims supported by context? (0-1). Target > 0.85.
-- Answer Relevancy: Answer addresses the question? (0-1). Target > 0.80.
-- Context Precision: Relevant chunks ranked higher? (0-1). Target > 0.75.
-- Context Recall: All relevant info retrieved? (0-1). Target > 0.80.
-- Answer Correctness: Factual accuracy vs ground truth. Target > 0.75.
-- Refusal Rate: Fraction of "I don't know" responses. Target 0.05-0.15.

@@ -1,0 +1,8 @@
+A data lake is a storage system designed to hold large amounts of raw
+and processed data in its original or near-original format.
+
+Data lakes commonly store structured, semi-structured, and unstructured data.
+Object storage such as Amazon S3 is frequently used to implement data lakes.
+
+Data lakes provide flexible storage and are often used before
+data is transformed for analytical workloads.

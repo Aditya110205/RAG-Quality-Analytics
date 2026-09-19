@@ -1,0 +1,10 @@
+Apache Airflow is an open-source platform for orchestrating workflows.
+It represents workflows as directed acyclic graphs called DAGs.
+A DAG contains tasks and defines dependencies between those tasks.
+
+Airflow is commonly used for batch data pipelines.
+Tasks can run Python code, execute shell commands, transfer data,
+or interact with external systems.
+
+Airflow supports scheduling, retries, logging, monitoring, and task dependencies.
+It is useful when a data pipeline needs reliable orchestration.

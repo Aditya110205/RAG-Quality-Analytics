@@ -1,0 +1,9 @@
+Amazon S3 is an object storage service provided by AWS.
+S3 stores data as objects inside buckets.
+
+S3 is commonly used as a data lake storage layer.
+Data engineers can store CSV, JSON, Parquet, images, logs, and other files in S3.
+
+S3 provides high durability and scalable storage.
+Applications can access S3 through APIs, SDKs, command-line tools,
+and AWS services.

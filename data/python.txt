@@ -1,0 +1,9 @@
+Python is a general-purpose programming language widely used in data engineering.
+It provides libraries for data processing, APIs, automation, testing,
+and pipeline development.
+
+Common Python libraries in data engineering include Pandas,
+Requests, PySpark, SQLAlchemy, and boto3.
+
+Python is often used to connect different systems and implement
+data transformation or orchestration logic.

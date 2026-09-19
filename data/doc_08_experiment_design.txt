@@ -1,7 +1,0 @@
-RAG experiments compare configurations to find Pareto-optimal settings:
-- Chunk size: 256, 512, 1024 tokens
-- Embedding model: MiniLM, OpenAI-small, OpenAI-large
-- Top-K: 3, 5, 10
-- Chunk overlap: 0%, 10%, 20%
-
-Each experiment runs same query set, logs all metrics. Compare on quality/cost/latency frontier. Best config depends on use case: chatbot favors speed, research favors quality.

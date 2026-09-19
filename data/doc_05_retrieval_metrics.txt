@@ -1,8 +1,0 @@
-Retrieval quality metrics evaluate if the right chunks are fetched:
-- Hit Rate @ K: Fraction of queries where ground-truth chunk is in top-K. Target > 0.85.
-- MRR (Mean Reciprocal Rank): Average of 1/rank of first relevant chunk. Target > 0.70.
-- Precision @ K: Relevant chunks in top-K / K.
-- Recall @ K: Relevant chunks in top-K / total relevant.
-- NDCG: Ranking quality considering relevance grades.
-
-Good retrieval is necessary but not sufficient for good generation. Garbage in, garbage out.

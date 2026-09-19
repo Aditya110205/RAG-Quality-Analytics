@@ -1,0 +1,8 @@
+ETL stands for Extract, Transform, Load.
+The process extracts data from source systems, transforms the data,
+and loads the result into a destination system.
+
+Transformation can include cleaning data, changing data types,
+removing duplicates, and applying business rules.
+
+ETL pipelines are common in traditional data engineering architectures.

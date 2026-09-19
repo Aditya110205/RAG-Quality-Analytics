@@ -1,0 +1,8 @@
+AWS Glue is a managed data integration service.
+It can discover, transform, and move data between different systems.
+
+Glue Data Catalog stores metadata about datasets.
+Glue jobs can run Apache Spark-based ETL workloads.
+
+AWS Glue is commonly used for serverless ETL pipelines
+and integration with services such as S3 and Redshift.
