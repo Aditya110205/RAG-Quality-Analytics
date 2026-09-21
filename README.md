@@ -1,22 +1,30 @@
 # RAG Quality Analytics
 
-A minimal local Retrieval-Augmented Generation (RAG) system built as
-the foundation for a RAG quality analytics platform.
+A minimal local Retrieval-Augmented Generation (RAG) system built as the foundation for a **RAG Quality Analytics platform**.
 
-## Week 1 MVP
+The project is being developed incrementally:
+
+**Week 1 → RAG MVP**
+**Week 2 → Operational Analytics**
+**Week 3 → RAG Quality Evaluation**
+
+---
+
+## Week 1 — RAG MVP
 
 The system:
 
 1. Loads text documents
 2. Splits documents into chunks
-3. Generates embeddings
+3. Generates embeddings using Sentence Transformers
 4. Stores embeddings in Chroma
 5. Retrieves relevant chunks
 6. Sends retrieved context to a local LLM
 7. Generates a grounded answer
 
-## Architecture
+### Week 1 Architecture
 
+```text
 data/*.txt
     ↓
 chunker.py
@@ -29,18 +37,268 @@ retriever.py
     ↓
 Ollama
     ↓
-answer
+Grounded Answer
+```
+
+---
+
+## Week 2 — RAG Operational Analytics
+
+Week 2 adds observability and operational analytics around the RAG pipeline.
+
+The system now tracks:
+
+* Query ID
+* Timestamp
+* Query
+* Retrieved chunks
+* Retrieval latency
+* Generation latency
+* Total latency
+* Input tokens
+* Output tokens
+* Total tokens
+* Cost per query
+* Model configuration
+* Top-K configuration
+
+### Analytics
+
+The project calculates:
+
+* Query count
+* Average latency
+* P50 latency
+* P95 latency
+* Average retrieval latency
+* Average generation latency
+* Average tokens per query
+* Average cost per query
+* Query volume by date
+* Metrics by model configuration
+
+### Week 2 Architecture
+
+```text
+                    ┌──────────────┐
+                    │   User Query │
+                    └──────┬───────┘
+                           ↓
+                    ┌──────────────┐
+                    │  Retriever   │
+                    └──────┬───────┘
+                           ↓
+                    Retrieval Latency
+                           ↓
+                    ┌──────────────┐
+                    │ Local Ollama │
+                    └──────┬───────┘
+                           ↓
+                    Generation Latency
+                           ↓
+                    ┌──────────────┐
+                    │    Answer    │
+                    └──────┬───────┘
+                           ↓
+                    ┌──────────────┐
+                    │   Logger     │
+                    └──────┬───────┘
+                           ↓
+                  queries.jsonl
+                           ↓
+                    analytics.csv
+                           ↓
+                  Streamlit Dashboard
+```
+
+---
+
+## Project Structure
+
+```text
+RAG-Quality-Analytics/
+│
+├── data/
+│   └── *.txt
+│
+├── logs/
+│   ├── queries.jsonl
+│   └── analytics.csv
+│
+├── frontend/
+│   └── dashboard.py
+│
+├── chroma_db/
+│
+├── ask.py
+├── chunker.py
+├── create_docs.py
+├── embedder.py
+├── generator.py
+├── retriever.py
+├── logger.py
+├── analytics.py
+├── export_analytics.py
+│
+├── requirements.txt
+├── README.md
+└── .gitignore
+```
+
+---
 
 ## Requirements
 
-- Windows
-- Python 3.13+
-- Ollama
+* Windows
+* Python 3.13+
+* Ollama
+* Chroma
+* Sentence Transformers
+* Streamlit
+* Pandas
+
+---
 
 ## Setup
 
-Create virtual environment:
+Create a virtual environment:
 
 ```powershell
 python -m venv .venv
+```
+
+Activate it:
+
+```powershell
 .venv\Scripts\Activate.ps1
+```
+
+Install dependencies:
+
+```powershell
+pip install -r requirements.txt
+```
+
+Make sure Ollama is installed and the required model is available.
+
+---
+
+## Run the RAG Pipeline
+
+Ask a question from the terminal:
+
+```powershell
+python ask.py "What is Apache Spark?"
+```
+
+The system:
+
+```text
+Question
+   ↓
+Retrieve relevant chunks
+   ↓
+Generate grounded answer
+   ↓
+Log operational metrics
+```
+
+---
+
+## Generate Analytics Dataset
+
+After running queries:
+
+```powershell
+python export_analytics.py
+```
+
+This creates:
+
+```text
+logs/analytics.csv
+```
+
+---
+
+## Run the Dashboard
+
+Start Streamlit from the project root:
+
+```powershell
+streamlit run frontend/dashboard.py
+```
+
+The dashboard displays:
+
+* Query count
+* Average latency
+* P50 latency
+* P95 latency
+* Average cost
+* Retrieval vs generation latency
+* Query volume
+* Query latency
+* Model/configuration metrics
+* Query logs
+
+---
+
+## Current Status
+
+### Week 1 — RAG MVP
+
+**Completed**
+
+* Document ingestion
+* Chunking
+* Embeddings
+* Chroma vector storage
+* Retrieval
+* Local LLM generation
+* Grounded answers
+
+### Week 2 — Operational Analytics
+
+**Completed**
+
+* Structured query logging
+* Latency tracking
+* Token tracking
+* Cost tracking schema
+* P50/P95 analytics
+* Configuration analytics
+* Analytics CSV layer
+* Streamlit operational dashboard
+
+### Week 3 — RAG Quality Evaluation
+
+**Next**
+
+* Evaluation dataset
+* RAGAS integration
+* Faithfulness
+* Answer relevance
+* Context relevance
+* Retrieval quality analysis
+* Quality analytics dashboard
+
+---
+
+## Project Goal
+
+The long-term goal is to build an analytics platform that evaluates a RAG system across:
+
+```text
+Usage
+  ↓
+Performance
+  ↓
+Cost
+  ↓
+Quality
+  ↓
+Experiments
+```
+
+The project starts with a local RAG pipeline and progressively adds the data and analytics layers required to understand **how the RAG system performs, how much it costs, and how accurately it answers questions**.
