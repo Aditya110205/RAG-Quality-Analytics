@@ -1,10 +1,10 @@
 from ollama import chat
 
 
-MODEL_NAME = "gemma3:latest "
+MODEL_NAME = "gemma3:latest"
 
 
-def generate_answer(query: str, chunks: list[dict]) -> str:
+def generate_answer(query: str, chunks: list[dict]) -> dict:
     context = "\n\n".join(
         f"Source: {chunk['source']}\n{chunk['text']}"
         for chunk in chunks
@@ -35,4 +35,8 @@ Question:
         ],
     )
 
-    return response["message"]["content"]
+    return {
+        "answer": response["message"]["content"],
+        "tokens_in": response.get("prompt_eval_count", 0),
+        "tokens_out": response.get("eval_count", 0),
+    }
