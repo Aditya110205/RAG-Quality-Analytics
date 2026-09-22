@@ -1,0 +1,25 @@
+name: "rag_quality_analytics"
+version: "1.0.0"
+config-version: 2
+
+profile: "rag_quality_analytics"
+
+model-paths:
+  - "models"
+
+target-path: "target"
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+vars:
+  project_root: "C:/Users/Aditya/OneDrive/Desktop/Practice/RAG-Quality-Analytics"
+
+models:
+  rag_quality_analytics:
+    staging:
+      +materialized: view
+
+    marts:
+      +materialized: table

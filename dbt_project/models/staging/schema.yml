@@ -1,0 +1,36 @@
+version: 2
+
+models:
+
+  - name: stg_queries
+
+    description: >
+      Cleaned RAG query events produced by the PySpark pipeline
+      and queried from partitioned Parquet.
+
+    columns:
+
+      - name: query_id
+
+        description: >
+          Unique identifier for a RAG query event.
+
+        tests:
+          - not_null
+          - unique
+
+      - name: event_timestamp
+
+        description: >
+          UTC timestamp when the query event occurred.
+
+        tests:
+          - not_null
+
+      - name: dt
+
+        description: >
+          Date partition derived from event_timestamp.
+
+        tests:
+          - not_null

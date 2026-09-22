@@ -1,0 +1,10 @@
+rag_quality_analytics:
+
+  target: dev
+
+  outputs:
+
+    dev:
+      type: duckdb
+      path: ../data/warehouse/analytics.duckdb
+      threads: 4
