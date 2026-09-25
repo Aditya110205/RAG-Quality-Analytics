@@ -1,16 +1,17 @@
 # RAG Quality Analytics
 
-A minimal local Retrieval-Augmented Generation (RAG) system built as the foundation for a **RAG Quality Analytics platform**.
+A local Retrieval-Augmented Generation (RAG) system extended into a **data engineering and analytics platform** for monitoring RAG usage, performance, cost, and data quality.
 
-The project is being developed incrementally:
+The project is developed incrementally:
 
 **Week 1 → RAG MVP**
 **Week 2 → Operational Analytics**
 **Week 3 → RAG Quality Evaluation**
+**Week 4 → Analytics Warehouse Pipeline**
 
 ---
 
-## Week 1 — RAG MVP
+# Week 1 — RAG MVP
 
 The system:
 
@@ -22,7 +23,7 @@ The system:
 6. Sends retrieved context to a local LLM
 7. Generates a grounded answer
 
-### Week 1 Architecture
+## Week 1 Architecture
 
 ```text
 data/*.txt
@@ -42,11 +43,11 @@ Grounded Answer
 
 ---
 
-## Week 2 — RAG Operational Analytics
+# Week 2 — RAG Operational Analytics
 
 Week 2 adds observability and operational analytics around the RAG pipeline.
 
-The system now tracks:
+The system tracks:
 
 * Query ID
 * Timestamp
@@ -62,7 +63,7 @@ The system now tracks:
 * Model configuration
 * Top-K configuration
 
-### Analytics
+## Analytics
 
 The project calculates:
 
@@ -77,7 +78,7 @@ The project calculates:
 * Query volume by date
 * Metrics by model configuration
 
-### Week 2 Architecture
+## Week 2 Architecture
 
 ```text
                     ┌──────────────┐
@@ -106,24 +107,351 @@ The project calculates:
                            ↓
                   queries.jsonl
                            ↓
-                    analytics.csv
+                  Analytics Dataset
                            ↓
                   Streamlit Dashboard
 ```
 
 ---
 
-## Project Structure
+# Week 3 — RAG Quality Evaluation
+
+Week 3 focuses on evaluating the quality of generated RAG answers and retrieval results.
+
+Planned evaluation dimensions include:
+
+* Faithfulness
+* Answer relevance
+* Context relevance
+* Retrieval quality
+* Groundedness
+
+> Evaluation datasets and quality metrics are developed separately from the operational telemetry pipeline.
+
+---
+
+# Week 4 — Analytics Warehouse Pipeline
+
+Week 4 transforms the project from a simple logging/dashboard system into a **local analytical data platform**.
+
+The pipeline now uses:
+
+* PySpark
+* Parquet
+* DuckDB
+* dbt
+* Streamlit
+
+## Week 4 Data Engineering Pipeline
+
+```text
+Raw Query Logs
+     │
+     │ JSONL
+     ▼
+┌──────────────┐
+│   PySpark    │
+│              │
+│ • Cleaning   │
+│ • Validation │
+│ • DQ checks  │
+│ • Dedup      │
+└──────┬───────┘
+       │
+       │ Partitioned Parquet
+       ▼
+┌──────────────┐
+│    DuckDB    │
+│   Warehouse  │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│     dbt      │
+│              │
+│  Staging     │
+│  Fact        │
+│  Dimensions  │
+│  Marts       │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│  Streamlit   │
+│  Analytics   │
+│  Dashboard   │
+└──────────────┘
+```
+
+## PySpark Processing
+
+The PySpark pipeline processes the raw JSONL query events and produces cleaned, partitioned Parquet data.
+
+It handles:
+
+* Schema normalization
+* Query ID normalization
+* Timestamp parsing
+* Query text cleaning
+* Retrieval latency
+* Generation latency
+* Total latency
+* Token metrics
+* Cost metrics
+* Nested model configuration extraction
+* Invalid query ID detection
+* Invalid timestamp detection
+* Duplicate query ID handling
+* Date partitioning
+
+### Output
+
+```text
+data/
+└── processed/
+    └── queries/
+        ├── dt=2026-09-21/
+        │   └── *.parquet
+        └── ...
+```
+
+Parquet files are partitioned by:
+
+```text
+dt
+```
+
+---
+
+# DuckDB Analytical Warehouse
+
+The cleaned Parquet data is queried through DuckDB.
+
+Warehouse location:
+
+```text
+data/warehouse/analytics.duckdb
+```
+
+DuckDB provides the local analytical storage layer without requiring a cloud warehouse.
+
+---
+
+# dbt Transformation Layer
+
+dbt manages the SQL transformation layer inside the warehouse.
+
+## Staging
+
+```text
+stg_queries
+```
+
+Provides a cleaned and standardized representation of the query events.
+
+## Fact
+
+```text
+fct_query_events
+```
+
+Grain:
+
+```text
+1 row = 1 RAG query event
+```
+
+The fact table contains:
+
+* Query ID
+* Query text
+* Event timestamp
+* Latency metrics
+* Token metrics
+* Cost
+* Model
+* Top-K
+* Configuration
+* Data-quality flags
+* Date partition
+
+## Dimension
+
+```text
+dim_models
+```
+
+Contains distinct LLM models observed in the query events.
+
+## Analytical Marts
+
+### Daily Metrics
+
+```text
+agg_daily_metrics
+```
+
+Provides:
+
+* Query count
+* Average latency
+* P50 latency
+* P95 latency
+* Average retrieval latency
+* Average generation latency
+* Average tokens
+* Average cost
+
+### Quality Metrics
+
+```text
+agg_quality_metrics
+```
+
+Provides data-quality measurements such as:
+
+* Invalid query count
+* Invalid timestamp count
+* Invalid query rate
+* Invalid timestamp rate
+
+### Configuration Metrics
+
+```text
+agg_configuration_metrics
+```
+
+Provides metrics by:
+
+* Model
+* Top-K
+* Query count
+* Average latency
+* P50 latency
+* P95 latency
+* Retrieval latency
+* Generation latency
+* Token usage
+* Cost
+
+---
+
+# Data Quality
+
+The pipeline explicitly handles data-quality problems instead of silently producing incorrect analytics.
+
+Current checks include:
+
+```text
+Null query IDs
+Invalid timestamps
+Duplicate query IDs
+Null required fields
+```
+
+dbt tests validate important warehouse constraints such as:
+
+```text
+not_null
+unique
+```
+
+The Week 4 warehouse pipeline currently passes its configured dbt data-quality tests.
+
+---
+
+# Streamlit Analytics Dashboard
+
+Streamlit acts as the **presentation layer**.
+
+The dashboard reads analytical data from DuckDB/dbt rather than performing the primary warehouse transformations itself.
+
+## Dashboard
+
+The dashboard provides:
+
+* Total queries
+* Average latency
+* P50 latency
+* P95 latency
+* Average cost
+* Retrieval latency
+* Generation latency
+* Query volume
+* Daily latency
+* Model/configuration performance
+* Data-quality metrics
+* Query event logs
+
+## Dashboard Architecture
+
+```text
+                 DuckDB
+                    │
+                    ▼
+             dbt Analytical Marts
+                    │
+        ┌───────────┼───────────┐
+        ▼           ▼           ▼
+   Daily Metrics  Quality   Configuration
+        │           │           │
+        └───────────┼───────────┘
+                    ▼
+               Streamlit
+                    │
+                    ▼
+             Analytics UI
+```
+
+This separation keeps the architecture clean:
+
+```text
+PySpark → Data Processing
+DuckDB   → Analytical Storage
+dbt      → Transformations
+Streamlit → Visualization
+```
+
+---
+
+# Project Structure
 
 ```text
 RAG-Quality-Analytics/
 │
 ├── data/
-│   └── *.txt
+│   ├── *.txt
+│   ├── processed/
+│   │   └── queries/
+│   │       └── dt=YYYY-MM-DD/
+│   │           └── *.parquet
+│   │
+│   ├── quarantine/
+│   │   └── queries/
+│   │
+│   └── warehouse/
+│       └── analytics.duckdb
 │
 ├── logs/
 │   ├── queries.jsonl
 │   └── analytics.csv
+│
+├── dbt_project/
+│   ├── dbt_project.yml
+│   ├── profiles.yml
+│   │
+│   └── models/
+│       ├── staging/
+│       │   ├── stg_queries.sql
+│       │   └── schema.yml
+│       │
+│       └── marts/
+│           ├── fct_query_events.sql
+│           ├── dim_models.sql
+│           ├── agg_daily_metrics.sql
+│           ├── agg_quality_metrics.sql
+│           ├── agg_configuration_metrics.sql
+│           └── schema.yml
 │
 ├── frontend/
 │   └── dashboard.py
@@ -139,6 +467,8 @@ RAG-Quality-Analytics/
 ├── logger.py
 ├── analytics.py
 ├── export_analytics.py
+├── spark_job.py
+├── verify_parquet.py
 │
 ├── requirements.txt
 ├── README.md
@@ -147,19 +477,24 @@ RAG-Quality-Analytics/
 
 ---
 
-## Requirements
+# Requirements
 
 * Windows
 * Python 3.13+
+* Java 17+
 * Ollama
 * Chroma
 * Sentence Transformers
+* PySpark
+* DuckDB
+* dbt
+* dbt-duckdb
 * Streamlit
 * Pandas
 
 ---
 
-## Setup
+# Setup
 
 Create a virtual environment:
 
@@ -179,11 +514,11 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Make sure Ollama is installed and the required model is available.
+Make sure Ollama is installed and the required local model is available.
 
 ---
 
-## Run the RAG Pipeline
+# Run the RAG Pipeline
 
 Ask a question from the terminal:
 
@@ -205,48 +540,56 @@ Log operational metrics
 
 ---
 
-## Generate Analytics Dataset
+# Run the Data Engineering Pipeline
 
-After running queries:
+Process the raw query logs:
 
 ```powershell
-python export_analytics.py
+python spark_job.py
 ```
 
-This creates:
+This produces partitioned Parquet data under:
 
 ```text
-logs/analytics.csv
+data/processed/queries/
+```
+
+Run the dbt transformations:
+
+```powershell
+cd dbt_project
+dbt run
+```
+
+Run the data-quality tests:
+
+```powershell
+dbt test
+```
+
+The resulting analytical warehouse is:
+
+```text
+data/warehouse/analytics.duckdb
 ```
 
 ---
 
-## Run the Dashboard
+# Run the Dashboard
 
-Start Streamlit from the project root:
+From the project root:
 
 ```powershell
 streamlit run frontend/dashboard.py
 ```
 
-The dashboard displays:
-
-* Query count
-* Average latency
-* P50 latency
-* P95 latency
-* Average cost
-* Retrieval vs generation latency
-* Query volume
-* Query latency
-* Model/configuration metrics
-* Query logs
+The dashboard reads analytical data from the DuckDB warehouse.
 
 ---
 
-## Current Status
+# Current Status
 
-### Week 1 — RAG MVP
+## Week 1 — RAG MVP
 
 **Completed**
 
@@ -258,7 +601,7 @@ The dashboard displays:
 * Local LLM generation
 * Grounded answers
 
-### Week 2 — Operational Analytics
+## Week 2 — Operational Analytics
 
 **Completed**
 
@@ -268,26 +611,45 @@ The dashboard displays:
 * Cost tracking schema
 * P50/P95 analytics
 * Configuration analytics
-* Analytics CSV layer
-* Streamlit operational dashboard
+* Analytics dataset
+* Operational dashboard
 
-### Week 3 — RAG Quality Evaluation
+## Week 3 — RAG Quality Evaluation
 
-**Next**
+**In Progress / Planned**
 
 * Evaluation dataset
-* RAGAS integration
+* RAG quality metrics
 * Faithfulness
 * Answer relevance
 * Context relevance
 * Retrieval quality analysis
 * Quality analytics dashboard
 
+## Week 4 — Analytics Warehouse Pipeline
+
+**Completed**
+
+* PySpark JSONL processing
+* Schema normalization
+* Data-quality handling
+* Duplicate handling
+* Partitioned Parquet
+* DuckDB warehouse
+* dbt staging models
+* dbt fact model
+* dbt dimension model
+* Daily analytical mart
+* Quality analytical mart
+* Configuration analytical mart
+* dbt data-quality tests
+* Streamlit → DuckDB integration
+
 ---
 
-## Project Goal
+# Long-Term Goal
 
-The long-term goal is to build an analytics platform that evaluates a RAG system across:
+The long-term goal is to build a complete analytics platform for understanding RAG systems across:
 
 ```text
 Usage
@@ -300,14 +662,15 @@ Quality
   ↓
 Experiments
 ```
-
 The project starts with a local RAG pipeline and progressively adds the data and analytics layers required to understand **how the RAG system performs, how much it costs, and how accurately it answers questions**.
 
-## Week 5 — RAG Experimentation
+---
+
+# Week 5 — RAG Experimentation
 
 Week 5 introduced controlled experimentation to measure the impact of RAG configuration on system performance.
 
-### Experiment Setup
+## Experiment Setup
 
 | Variable | Values |
 |---|---|
@@ -318,7 +681,7 @@ Week 5 introduced controlled experimentation to measure the impact of RAG config
 | Queries / Configuration | 5 |
 | Generation Cost | $0 (local Ollama) |
 
-### Results
+## Results
 
 | Experiment | Chunk Size | Avg Latency | P95 Latency | Avg Tokens | Cost |
 |---|---:|---:|---:|---:|---:|
@@ -326,7 +689,7 @@ Week 5 introduced controlled experimentation to measure the impact of RAG config
 | EXP_002 | 512 | 1305 ms | 1760 ms | 460.4 | $0 |
 | EXP_003 | 1024 | 1302 ms | 1820 ms | 464.2 | $0 |
 
-### Findings
+## Findings
 
 - 512 and 1024 chunk configurations produced nearly identical average latency.
 - The 256 chunk configuration showed substantially higher average and P95 latency in this experiment.
@@ -334,9 +697,10 @@ Week 5 introduced controlled experimentation to measure the impact of RAG config
 - Token usage remained nearly constant across the three configurations.
 - All experiments had zero generation cost because the system used a local Ollama model.
 - The experiment used 5 queries per configuration, so results should be treated as an initial benchmark rather than a statistically generalizable conclusion.
+- All three configurations used `top_k=5` and `overlap=10%`.
 - RAGAS quality metrics were not included because no validated ground-truth evaluation dataset was available.
 
-### Analytics Architecture
+## Analytics Architecture
 
 ```text
 RAG Experiment Runner
@@ -350,3 +714,52 @@ agg_experiment_comparison
 Streamlit Experiments
         ↓
 Power BI Experiment Analytics
+
+                    RAG APPLICATION
+
+                          │
+                          ▼
+
+                    User Questions
+
+                          │
+              ┌───────────┴───────────┐
+              ▼                       ▼
+          Retriever                Ollama
+              │                       │
+              └───────────┬───────────┘
+                          ▼
+                    Query Logger
+                          │
+                          ▼
+                    queries.jsonl
+                          │
+                          ▼
+                       PySpark
+                          │
+             ┌────────────┼────────────┐
+             ▼            ▼            ▼
+          Cleaning        DQ       Deduplication
+             │
+             ▼
+       Partitioned Parquet
+             │
+             ▼
+           DuckDB
+             │
+             ▼
+            dbt
+             │
+       ┌─────┼──────┬──────────┐
+       ▼     ▼      ▼          ▼
+    Staging Fact Dimensions  Marts
+                              │
+                              ▼
+                         Streamlit
+                              │
+                              ▼
+                   RAG Analytics platform
+
+
+
+
