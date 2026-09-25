@@ -89,6 +89,26 @@ query_df = con.sql(
     """
 ).df()
 
+experiment_df = con.sql(
+    """
+    SELECT
+        experiment_id,
+        chunk_size,
+        overlap_percent,
+        top_k,
+        model,
+        query_count,
+        avg_latency_ms,
+        p95_latency_ms,
+        avg_retrieval_latency_ms,
+        avg_generation_latency_ms,
+        avg_total_tokens,
+        avg_cost_usd
+    FROM agg_experiment_comparison
+    ORDER BY chunk_size
+    """
+).df()
+
 
 # ============================================================
 # APP HEADER
@@ -204,6 +224,68 @@ if not quality_df.empty:
     q3.metric("Invalid Timestamp Rate", f"{latest_quality['invalid_timestamp_rate']:.2f}%")
 else:
     st.info("No quality metrics available.")
+
+
+# ============================================================
+# EXPERIMENT ANALYTICS — WEEK 5
+# ============================================================
+
+st.divider()
+
+st.header("RAG Configuration Experiments")
+
+st.caption(
+    "Controlled comparison of chunk size with top-k=5 and overlap=10%."
+)
+
+if not experiment_df.empty:
+
+    st.subheader("Experiment Comparison")
+
+    st.dataframe(
+        experiment_df,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.subheader("Average Latency by Chunk Size")
+
+    latency_chart = experiment_df[
+        ["chunk_size", "avg_latency_ms"]
+    ].copy()
+
+    latency_chart = latency_chart.set_index("chunk_size")
+
+    st.bar_chart(latency_chart)
+
+    st.subheader("P95 Latency by Chunk Size")
+
+    p95_chart = experiment_df[
+        ["chunk_size", "p95_latency_ms"]
+    ].copy()
+
+    p95_chart = p95_chart.set_index("chunk_size")
+
+    st.bar_chart(p95_chart)
+
+    st.subheader("Average Cost vs Latency")
+
+    cost_latency = experiment_df[
+        [
+            "experiment_id",
+            "avg_cost_usd",
+            "avg_latency_ms"
+        ]
+    ].copy()
+
+    st.dataframe(
+        cost_latency,
+        use_container_width=True,
+        hide_index=True
+    )
+
+else:
+    st.info("No experiment results available.")
 
 
 # ============================================================

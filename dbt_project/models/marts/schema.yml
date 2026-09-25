@@ -1,13 +1,10 @@
 version: 2
 
 models:
-
   - name: fct_query_events
     description: >
       Fact table containing one row per RAG query event.
-
     columns:
-
       - name: query_id
         description: >
           Unique identifier for the RAG query event.
@@ -30,9 +27,7 @@ models:
   - name: dim_models
     description: >
       Dimension containing distinct LLM models observed in query events.
-
     columns:
-
       - name: model_key
         description: >
           Surrogate key for the model.
@@ -50,9 +45,7 @@ models:
   - name: agg_daily_metrics
     description: >
       Daily operational metrics for RAG query performance.
-
     columns:
-
       - name: dt
         description: >
           Date partition for the daily aggregate metrics.
@@ -69,19 +62,50 @@ models:
   - name: agg_configuration_metrics
     description: >
       Query performance aggregated by LLM model and retrieval configuration.
-
     columns:
-
       - name: model
         description: >
           LLM model used for generation.
+        tests:
+          - not_null
 
       - name: top_k
         description: >
           Number of retrieved chunks.
+        tests:
+          - not_null
 
       - name: query_count
         description: >
           Total number of queries matching this specific configuration.
+        tests:
+          - not_null
+
+  - name: agg_experiment_comparison
+    description: >
+      Performance comparison across controlled RAG experiments.
+    columns:
+      - name: experiment_id
+        description: >
+          Unique identifier for the RAG experiment.
+        tests:
+          - not_null
+          - unique
+
+      - name: query_count
+        description: >
+          Total number of queries run under this experiment.
+        tests:
+          - not_null
+
+      - name: avg_latency_ms
+        description: >
+          Average total latency in milliseconds for the experiment.
+        tests:
+          - not_null
+
+      - name: p95_latency_ms
+        description: >
+          95th percentile latency in milliseconds for the experiment.
         tests:
           - not_null

@@ -1,0 +1,4 @@
+experiment_id,chunk_size,overlap_percent,top_k,model,query_count,avg_latency_ms,p95_latency_ms,avg_retrieval_latency_ms,avg_generation_latency_ms,avg_total_tokens,avg_cost_usd
+EXP_000,256,10,5,gemma3:latest,5,3879.19,11778.48,367.72,3511.47,460.4,0.0
+EXP_002,512,10,5,gemma3:latest,5,1304.84,1759.77,250.08,1054.76,460.4,0.0
+EXP_003,1024,10,5,gemma3:latest,5,1302.49,1819.6,224.15,1078.34,464.2,0.0
