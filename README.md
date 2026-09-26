@@ -760,6 +760,27 @@ Power BI Experiment Analytics
                               ▼
                    RAG Analytics platform
 
+## API Architecture
+
+The project uses FastAPI as an analytics API layer between the Streamlit dashboard and the analytical warehouse for selected business-level metrics.
+
+### Request Flow
+
+Streamlit → FastAPI → DuckDB
+
+FastAPI currently exposes:
+
+- `GET /health`
+- `POST /query`
+- `GET /metrics/daily`
+- `GET /metrics/experiments`
+- `GET /metrics/distribution`
+
+Streamlit uses the API for daily metrics and experiment analytics.
+
+For detailed raw query events and lower-level analytical exploration, Streamlit continues to query DuckDB directly. This avoids adding unnecessary API endpoints for operations that are better handled directly in the analytical warehouse.
+
+This hybrid architecture keeps the API focused on reusable application-level metrics while preserving efficient analytical access to DuckDB.
 
 
 

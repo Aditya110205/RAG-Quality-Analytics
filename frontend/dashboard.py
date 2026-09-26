@@ -1,7 +1,9 @@
+
 from pathlib import Path
 
 import duckdb
 import pandas as pd
+import requests
 import streamlit as st
 
 
@@ -18,9 +20,11 @@ DB_FILE = (
     / "analytics.duckdb"
 )
 
+API_URL = "http://127.0.0.1:8000"
+
 st.set_page_config(
     page_title="RAG Quality Analytics",
-    layout="wide"
+    layout="wide",
 )
 
 
@@ -33,7 +37,7 @@ def get_connection():
     """Establish a cached, read-only connection to the DuckDB warehouse."""
     return duckdb.connect(
         str(DB_FILE),
-        read_only=True
+        read_only=True,
     )
 
 
@@ -44,10 +48,28 @@ con = get_connection()
 # LOAD ANALYTICAL MARTS
 # ============================================================
 
-daily_df = con.sql(
+try:
+    response = requests.get(
+        f"{API_URL}/metrics/daily",
+        timeout=10,
+    )
+    response.raise_for_status()
+
+    daily_df = pd.DataFrame(response.json())
+
+    if "date" in daily_df.columns:
+        daily_df = daily_df.rename(
+            columns={"date": "dt"}
+        )
+
+except requests.RequestException as exc:
+    st.error(f"Failed to load daily metrics from API: {exc}")
+    daily_df = pd.DataFrame()
+
+quality_df = con.sql(
     """
     SELECT *
-    FROM agg_daily_metrics
+    FROM agg_quality_metrics
     ORDER BY dt
     """
 ).df()
@@ -89,25 +111,25 @@ query_df = con.sql(
     """
 ).df()
 
-experiment_df = con.sql(
-    """
-    SELECT
-        experiment_id,
-        chunk_size,
-        overlap_percent,
-        top_k,
-        model,
-        query_count,
-        avg_latency_ms,
-        p95_latency_ms,
-        avg_retrieval_latency_ms,
-        avg_generation_latency_ms,
-        avg_total_tokens,
-        avg_cost_usd
-    FROM agg_experiment_comparison
-    ORDER BY chunk_size
-    """
-).df()
+try:
+    response = requests.get(
+        f"{API_URL}/metrics/experiments",
+        timeout=10,
+    )
+    response.raise_for_status()
+
+    experiment_df = pd.DataFrame(response.json())
+
+    if not experiment_df.empty:
+        experiment_df = experiment_df.sort_values(
+            "chunk_size"
+        ).reset_index(drop=True)
+
+except requests.RequestException as exc:
+    st.error(
+        f"Failed to load experiment metrics from API: {exc}"
+    )
+    experiment_df = pd.DataFrame()
 
 
 # ============================================================
@@ -115,7 +137,12 @@ experiment_df = con.sql(
 # ============================================================
 
 st.title("RAG Operational Analytics")
-st.caption("Week 4 — PySpark → Parquet → dbt → DuckDB Pipeline Dashboard")
+
+st.caption(
+
+"AI Quality & Performance Dashboard for Retrieval-Augmented Generation (RAG) Systems"
+
+)
 
 st.divider()
 
@@ -125,12 +152,22 @@ st.divider()
 # ============================================================
 
 total_queries = len(query_df)
+
 avg_latency = query_df["total_latency_ms"].mean()
+
 p50_latency = query_df["total_latency_ms"].quantile(0.50)
+
 p95_latency = query_df["total_latency_ms"].quantile(0.95)
+
 avg_retrieval = query_df["retrieval_latency_ms"].mean()
+
 avg_generation = query_df["generation_latency_ms"].mean()
-avg_cost = query_df["cost_usd"].mean() if "cost_usd" in query_df.columns else float("nan")
+
+avg_cost = (
+    query_df["cost_usd"].mean()
+    if "cost_usd" in query_df.columns
+    else float("nan")
+)
 
 
 # ============================================================
@@ -141,11 +178,38 @@ st.subheader("High-Level Performance Overview")
 
 col1, col2, col3, col4, col5 = st.columns(5)
 
-col1.metric("Total Queries", f"{total_queries:,}")
-col2.metric("Avg Latency", f"{avg_latency:.0f} ms" if pd.notna(avg_latency) else "N/A")
-col3.metric("P50 Latency", f"{p50_latency:.0f} ms" if pd.notna(p50_latency) else "N/A")
-col4.metric("P95 Latency", f"{p95_latency:.0f} ms" if pd.notna(p95_latency) else "N/A")
-col5.metric("Avg Cost", f"${avg_cost:.6f}" if pd.notna(avg_cost) else "N/A")
+col1.metric(
+    "Total Queries",
+    f"{total_queries:,}",
+)
+
+col2.metric(
+    "Avg Latency",
+    f"{avg_latency:.0f} ms"
+    if pd.notna(avg_latency)
+    else "N/A",
+)
+
+col3.metric(
+    "P50 Latency",
+    f"{p50_latency:.0f} ms"
+    if pd.notna(p50_latency)
+    else "N/A",
+)
+
+col4.metric(
+    "P95 Latency",
+    f"{p95_latency:.0f} ms"
+    if pd.notna(p95_latency)
+    else "N/A",
+)
+
+col5.metric(
+    "Avg Cost",
+    f"${avg_cost:.6f}"
+    if pd.notna(avg_cost)
+    else "N/A",
+)
 
 st.divider()
 
@@ -158,20 +222,37 @@ col_left, col_right = st.columns(2)
 
 with col_left:
     st.subheader("Latency Breakdown")
+
     latency_data = pd.DataFrame(
         {
             "Metric": ["Retrieval", "Generation"],
-            "Latency (ms)": [avg_retrieval, avg_generation]
+            "Latency (ms)": [
+                avg_retrieval,
+                avg_generation,
+            ],
         }
     )
-    st.bar_chart(latency_data.set_index("Metric"))
+
+    st.bar_chart(
+        latency_data.set_index("Metric")
+    )
+
 
 with col_right:
     st.subheader("Query Volume Trend")
+
     if not daily_df.empty:
-        daily_volume = daily_df[["dt", "query_count"]].copy()
-        daily_volume["dt"] = pd.to_datetime(daily_volume["dt"])
-        st.line_chart(daily_volume.set_index("dt"))
+        daily_volume = daily_df[
+            ["dt", "query_count"]
+        ].copy()
+
+        daily_volume["dt"] = pd.to_datetime(
+            daily_volume["dt"]
+        )
+
+        st.line_chart(
+            daily_volume.set_index("dt")
+        )
     else:
         st.info("No daily metrics available.")
 
@@ -188,11 +269,17 @@ if not daily_df.empty:
             "dt",
             "avg_latency_ms",
             "p50_latency_ms",
-            "p95_latency_ms"
+            "p95_latency_ms",
         ]
     ].copy()
-    daily_latency["dt"] = pd.to_datetime(daily_latency["dt"])
-    st.line_chart(daily_latency.set_index("dt"))
+
+    daily_latency["dt"] = pd.to_datetime(
+        daily_latency["dt"]
+    )
+
+    st.line_chart(
+        daily_latency.set_index("dt")
+    )
 else:
     st.info("No latency data available.")
 
@@ -204,7 +291,10 @@ else:
 st.subheader("Model & Configuration Performance")
 
 if not config_df.empty:
-    st.dataframe(config_df, use_container_width=True)
+    st.dataframe(
+        config_df,
+        use_container_width=True,
+    )
 else:
     st.info("No configuration metrics available.")
 
@@ -219,9 +309,21 @@ if not quality_df.empty:
     latest_quality = quality_df.iloc[-1]
 
     q1, q2, q3 = st.columns(3)
-    q1.metric("Invalid Queries", int(latest_quality["invalid_query_count"]))
-    q2.metric("Invalid Query Rate", f"{latest_quality['invalid_query_rate']:.2f}%")
-    q3.metric("Invalid Timestamp Rate", f"{latest_quality['invalid_timestamp_rate']:.2f}%")
+
+    q1.metric(
+        "Invalid Queries",
+        int(latest_quality["invalid_query_count"]),
+    )
+
+    q2.metric(
+        "Invalid Query Rate",
+        f"{latest_quality['invalid_query_rate']:.2f}%",
+    )
+
+    q3.metric(
+        "Invalid Timestamp Rate",
+        f"{latest_quality['invalid_timestamp_rate']:.2f}%",
+    )
 else:
     st.info("No quality metrics available.")
 
@@ -235,17 +337,17 @@ st.divider()
 st.header("RAG Configuration Experiments")
 
 st.caption(
-    "Controlled comparison of chunk size with top-k=5 and overlap=10%."
+    "Controlled comparison of chunk size with top-k=5 "
+    "and overlap=10%."
 )
 
 if not experiment_df.empty:
-
     st.subheader("Experiment Comparison")
 
     st.dataframe(
         experiment_df,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
 
     st.subheader("Average Latency by Chunk Size")
@@ -254,7 +356,9 @@ if not experiment_df.empty:
         ["chunk_size", "avg_latency_ms"]
     ].copy()
 
-    latency_chart = latency_chart.set_index("chunk_size")
+    latency_chart = latency_chart.set_index(
+        "chunk_size"
+    )
 
     st.bar_chart(latency_chart)
 
@@ -264,7 +368,9 @@ if not experiment_df.empty:
         ["chunk_size", "p95_latency_ms"]
     ].copy()
 
-    p95_chart = p95_chart.set_index("chunk_size")
+    p95_chart = p95_chart.set_index(
+        "chunk_size"
+    )
 
     st.bar_chart(p95_chart)
 
@@ -274,16 +380,15 @@ if not experiment_df.empty:
         [
             "experiment_id",
             "avg_cost_usd",
-            "avg_latency_ms"
+            "avg_latency_ms",
         ]
     ].copy()
 
     st.dataframe(
         cost_latency,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
-
 else:
     st.info("No experiment results available.")
 
@@ -295,4 +400,8 @@ else:
 st.divider()
 
 with st.expander("🔍 View Raw Query Events Explorer"):
-    st.dataframe(query_df, use_container_width=True)
+    st.dataframe(
+        query_df,
+        use_container_width=True,
+    )
+
